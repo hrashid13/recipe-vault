@@ -1,0 +1,121 @@
+@{
+    ViewData["Title"] = "Newsletter Templates";
+}
+
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <div style="margin-bottom: 30px;">
+        <a href="/admin/newsletter" style="color: #667eea; text-decoration: none;">← Back to Dashboard</a>
+        <h1 style="color: #333; margin: 10px 0;"> Newsletter Templates</h1>
+        <p style="color: #666;">Pre-designed templates to help you create engaging newsletters</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+        <!-- Weekly Roundup Template -->
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; color: white; text-align: center;">
+                <h3 style="margin: 0;"> Weekly Roundup</h3>
+            </div>
+            <div style="padding: 25px;">
+                <p style="color: #666; margin-bottom: 20px;">
+                    Perfect for sharing your best recipes of the week. Features a clean layout with recipe cards.
+                </p>
+                <ul style="color: #666; padding-left: 20px; margin-bottom: 20px;">
+                    <li>Recipe highlight sections</li>
+                    <li>Time and serving information</li>
+                    <li>Call-to-action buttons</li>
+                    <li>Professional gradient header</li>
+                </ul>
+                <a href="/admin/newsletter/compose" class="btn" style="display: inline-block; padding: 12px 30px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    Use This Template
+                </a>
+            </div>
+        </div>
+
+        <!-- Featured Recipes Template -->
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); padding: 30px; color: white; text-align: center;">
+                <h3 style="margin: 0;"> Featured Recipes</h3>
+            </div>
+            <div style="padding: 25px;">
+                <p style="color: #666; margin-bottom: 20px;">
+                    Showcase your top-rated or most popular recipes. Includes highlight boxes for special attention.
+                </p>
+                <ul style="color: #666; padding-left: 20px; margin-bottom: 20px;">
+                    <li>Highlighted recipe sections</li>
+                    <li>Chef's pick callouts</li>
+                    <li>Rating and review integration</li>
+                    <li>Warm color scheme</li>
+                </ul>
+                <a href="/admin/newsletter/compose" class="btn" style="display: inline-block; padding: 12px 30px; background: #ff6b6b; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    Use This Template
+                </a>
+            </div>
+        </div>
+
+        <!-- Seasonal Template -->
+        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div style="background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%); padding: 30px; color: white; text-align: center;">
+                <h3 style="margin: 0;"> Seasonal Favorites</h3>
+            </div>
+            <div style="padding: 25px;">
+                <p style="color: #666; margin-bottom: 20px;">
+                    Perfect for highlighting seasonal ingredients and recipes. Fresh, nature-inspired design.
+                </p>
+                <ul style="color: #666; padding-left: 20px; margin-bottom: 20px;">
+                    <li>Seasonal ingredient lists</li>
+                    <li>Fresh, green color palette</li>
+                    <li>Multi-column layout</li>
+                    <li>Nature-themed styling</li>
+                </ul>
+                <a href="/admin/newsletter/compose" class="btn" style="display: inline-block; padding: 12px 30px; background: #56ab2f; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    Use This Template
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 40px;">
+        <h2 style="color: #333; margin-bottom: 20px;"> Newsletter Best Practices</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+            <div>
+                <h3 style="color: #667eea; font-size: 18px; margin-bottom: 10px;">Content Tips</h3>
+                <ul style="color: #666; line-height: 1.8;">
+                    <li>Keep subject lines under 50 characters</li>
+                    <li>Lead with your best content</li>
+                    <li>Include 3-5 recipes max per newsletter</li>
+                    <li>Add personal touches and chef notes</li>
+                    <li>Use high-quality recipe images</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #667eea; font-size: 18px; margin-bottom: 10px;">Design Tips</h3>
+                <ul style="color: #666; line-height: 1.8;">
+                    <li>Maintain consistent branding</li>
+                    <li>Use white space effectively</li>
+                    <li>Ensure mobile responsiveness</li>
+                    <li>Include clear call-to-action buttons</li>
+                    <li>Keep total width under 600px</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #667eea; font-size: 18px; margin-bottom: 10px;">Timing Tips</h3>
+                <ul style="color: #666; line-height: 1.8;">
+                    <li>Send on consistent schedule</li>
+                    <li>Best times: Tue-Thu, 10am-2pm</li>
+                    <li>Avoid Monday mornings and Fridays</li>
+                    <li>Test different send times</li>
+                    <li>Don't send more than once per week</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+</style>

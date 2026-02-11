@@ -1,0 +1,104 @@
+﻿@model RecipeManager.Models.Recipe
+
+@{
+    ViewData["Title"] = Model.RecipeName;
+}
+
+<div class="container mt-4">
+    <h1>@Model.RecipeName</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Description</h5>
+            <p class="card-text">@Model.Description</p>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>@Model.RecipeName</h1>
+                <partial name="_SaveRecipeButton" model="Model.RecipeID" />
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <strong>Prep Time:</strong> @Model.PrepTime minutes
+                </div>
+                <div class="col-md-3">
+                    <strong>Cook Time:</strong> @Model.CookTime minutes
+                </div>
+                <div class="col-md-3">
+                    <strong>Servings:</strong> @Model.Servings
+                </div>
+                <div class="col-md-3">
+                    <strong>Cuisine:</strong> @Model.Cuisine?.CuisineType
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.DifficultyLevel))
+            {
+                    <div class="mt-2">
+                        <strong>Difficulty:</strong> @Model.DifficultyLevel
+                    </div>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3>Ingredients</h3>
+            @if (Model.RecipeIngredients != null && Model.RecipeIngredients.Any())
+            {
+                    <ul class="list-group list-group-flush">
+                    @foreach (var ri in Model.RecipeIngredients)
+                    {
+                                <li class="list-group-item">
+                                    <strong>@ri.Quantity @ri.Unit?.UnitName</strong> @ri.Ingredient?.IngredientName
+                            @if (!string.IsNullOrEmpty(ri.Notes))
+                            {
+                                            <em class="text-muted">(@ri.Notes)</em>
+                            }
+                                </li>
+                    }
+                    </ul>
+            }
+            else
+            {
+                    <p class="text-muted">No ingredients listed.</p>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h3>Instructions</h3>
+            @if (Model.Instructions != null && Model.Instructions.Any())
+            {
+                    <ol class="list-group list-group-numbered">
+                    @foreach (var instruction in Model.Instructions.OrderBy(i => i.StepNumber))
+                    {
+                                <li class="list-group-item">@instruction.InstructionText</li>
+                    }
+                    </ol>
+            }
+            else
+            {
+                    <p class="text-muted">No instructions provided.</p>
+            }
+        </div>
+    </div>
+
+    @if (Model.RecipeTags != null && Model.RecipeTags.Any())
+    {
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>Tags</h5>
+                    <div>
+                    @foreach (var rt in Model.RecipeTags)
+                    {
+                                <span class="badge bg-secondary me-2">@rt.Tag?.TagName</span>
+                    }
+                    </div>
+                </div>
+            </div>
+    }
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-secondary">Back to Recipes</a>
+    </div>
+</div>

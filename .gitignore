@@ -1,0 +1,26 @@
+# Secrets
+appsettings.Development.json
+appsettings.Production.json
+*.secret.*
+
+# Build outputs
+bin/
+obj/
+*.dll
+*.exe
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Database
+*.mdf
+*.ldf
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

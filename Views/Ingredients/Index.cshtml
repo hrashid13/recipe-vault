@@ -1,0 +1,411 @@
+@model IEnumerable<RecipeManager.Models.Ingredient>
+
+@{
+    ViewData["Title"] = "Ingredients";
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="ingredients-container">
+    <div class="page-header">
+        <h1>Ingredient Library</h1>
+        <p class="subtitle">Browse our collection of @Model.Count() ingredients</p>
+    </div>
+
+    <div class="filters-section">
+        <form method="get" asp-action="Index" class="filter-form">
+            <div class="filter-group">
+                <label for="searchString">
+                    <span class="icon"></span>
+                    Search
+                </label>
+                <input type="text" name="searchString" id="searchString" class="filter-input" 
+                       placeholder="Search ingredients..." value="@ViewBag.CurrentSearch">
+            </div>
+
+            <div class="filter-group">
+                <label for="categoryFilter">
+                    <span class="icon"></span>
+                    Filter by Category
+                </label>
+                <select name="categoryFilter" id="categoryFilter" class="filter-select" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.CategoryID" selected="@(ViewBag.CurrentCategory == category.CategoryID)">
+                                @category.CategoryName
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <button type="submit" class="btn-search">Search</button>
+
+            @if (ViewBag.CurrentCategory != null || !string.IsNullOrEmpty(ViewBag.CurrentSearch))
+            {
+                <a asp-action="Index" class="clear-filters">Clear All</a>
+            }
+        </form>
+
+        <a asp-action="Create" class="btn-create">+ Add New Ingredient</a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="ingredients-table-wrapper">
+            <table class="ingredients-table">
+                <thead>
+                    <tr>
+                        <th>Ingredient Name</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ingredient in Model)
+                    {
+                        <tr>
+                            <td class="ingredient-name">
+                                <span class="name-text">@ingredient.IngredientName</span>
+                            </td>
+                            <td>
+                                @if (ingredient.Category != null)
+                                {
+                                    <span class="category-badge">@ingredient.Category.CategoryName</span>
+                                }
+                                else
+                                {
+                                    <span class="category-badge uncategorized">Uncategorized</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <div class="empty-icon"></div>
+            <h3>No ingredients found</h3>
+            <p>Try adjusting your filter or add a new ingredient to get started!</p>
+            <a asp-action="Create" class="btn-create">+ Add Your First Ingredient</a>
+        </div>
+    }
+</div>
+
+<style>
+    * {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .ingredients-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 48px;
+    }
+
+    .page-header h1 {
+        font-size: 3em;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+        font-size: 1.2em;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .filters-section {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .filter-form {
+        display: flex;
+        gap: 16px;
+        flex: 1;
+        flex-wrap: wrap;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 250px;
+        flex: 1;
+    }
+
+    .filter-group label {
+        font-size: 0.9em;
+        font-weight: 600;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .icon {
+        font-size: 1em;
+    }
+
+    .filter-input {
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #1f2937;
+        background: #fafafa;
+        transition: all 0.2s;
+    }
+
+    .filter-input:hover {
+        border-color: #d4521e;
+        background: white;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #d4521e;
+        box-shadow: 0 0 0 4px rgba(212, 82, 30, 0.1);
+        background: white;
+    }
+
+    .filter-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .filter-select {
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 0.95em;
+        font-weight: 500;
+        color: #1f2937;
+        background: #fafafa;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-select:hover {
+        border-color: #d4521e;
+        background: white;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #d4521e;
+        box-shadow: 0 0 0 4px rgba(212, 82, 30, 0.1);
+    }
+
+    .btn-search {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95em;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        white-space: nowrap;
+        height: fit-content;
+        align-self: flex-end;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    }
+
+    .clear-filters {
+        padding: 12px 20px;
+        background: #fee;
+        color: #dc2626;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9em;
+        transition: all 0.2s;
+        height: fit-content;
+        align-self: flex-end;
+    }
+
+    .clear-filters:hover {
+        background: #fecaca;
+        transform: translateY(-2px);
+    }
+
+    .btn-create {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #d4521e 0%, #e8743b 100%);
+        color: white;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95em;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(212, 82, 30, 0.3);
+        white-space: nowrap;
+        height: fit-content;
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(212, 82, 30, 0.4);
+        color: white;
+    }
+
+    .ingredients-table-wrapper {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+    .ingredients-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .ingredients-table thead {
+        background: linear-gradient(135deg, #f8f9fa 0%, #f3f4f6 100%);
+    }
+
+    .ingredients-table th {
+        padding: 16px 24px;
+        text-align: left;
+        font-size: 0.85em;
+        font-weight: 700;
+        color: #4b5563;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .ingredients-table tbody tr {
+        border-bottom: 1px solid #f3f4f6;
+        transition: background 0.2s;
+    }
+
+    .ingredients-table tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .ingredients-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .ingredients-table td {
+        padding: 16px 24px;
+        color: #1f2937;
+    }
+
+    .ingredient-name {
+        font-weight: 600;
+        font-size: 1.05em;
+    }
+
+    .name-text {
+        color: #1a1a2e;
+    }
+
+    .category-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #d4521e 0%, #e8743b 100%);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.85em;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .category-badge.uncategorized {
+        background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .empty-icon {
+        font-size: 4em;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 1.8em;
+        color: #1a1a2e;
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        font-size: 1.1em;
+        margin-bottom: 24px;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 2em;
+        }
+
+        .filters-section {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-form {
+            flex-direction: column;
+        }
+
+        .filter-group {
+            min-width: auto;
+        }
+
+        .btn-search,
+        .btn-create,
+        .clear-filters {
+            width: 100%;
+            text-align: center;
+        }
+
+        .ingredients-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .ingredients-table th,
+        .ingredients-table td {
+            padding: 12px 16px;
+            font-size: 0.9em;
+        }
+    }
+</style>

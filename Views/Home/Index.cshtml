@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="text-center" style="padding: 50px 0;">
+    <h1 class="display-4">Welcome to Recipes Vault</h1>
+    <p class="lead">Manage your recipes, browse ingredients, or get AI-powered recipe recommendations!</p>
+    <div style="margin-top: 50px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <!-- Button 1: Browse Recipes -->
+        <a asp-controller="Recipe" asp-action="Index" class="btn btn-primary btn-lg" style="min-width: 250px; padding: 20px;">
+            <h4>Browse Recipes</h4>
+            <p style="margin: 0; font-size: 14px;">View and manage your recipe collection</p>
+        </a>
+
+        <!-- Button 2: Browse Ingredients -->
+        <a asp-controller="Ingredients" asp-action="Index" class="btn btn-success btn-lg" style="min-width: 250px; padding: 20px;">
+            <h4>Browse Ingredients</h4>
+            <p style="margin: 0; font-size: 14px;">Explore available ingredients</p>
+        </a>
+
+        <!-- Button 3: MunchAI -->
+        <a href="https://www.munchai.org/" target="_blank" class="btn btn-primary btn-lg" style="min-width: 250px; padding: 20px;">
+            <h4>Ask MunchAI</h4>
+            <p style="margin: 0; font-size: 14px;">Get AI-powered recipe recommendations</p>
+        </a>
+
+        <!-- Button 4: Sign In (Conditional) -->
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <a asp-controller="Account" asp-action="Login" class="btn btn-success btn-lg" style="min-width: 250px; padding: 20px;">
+                <h4>Sign In / Sign Up</h4>
+                <p style="margin: 0; font-size: 14px;">Connect your Gmail to unlock more features</p>
+            </a>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Profile" class="btn btn-success btn-lg" style="min-width: 250px; padding: 20px;">
+                <h4>View Profile</h4>
+                <p style="margin: 0; font-size: 14px;">Manage your account and preferences</p>
+            </a>
+        }
+    </div>
+</div>
+<style>
+    .btn-lg:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+</style>

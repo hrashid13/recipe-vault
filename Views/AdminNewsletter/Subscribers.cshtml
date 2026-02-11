@@ -1,0 +1,108 @@
+@model IEnumerable<RecipesVault.Models.NewsletterSubscriber>
+
+@{
+    ViewData["Title"] = "Newsletter Subscribers";
+}
+
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <div style="margin-bottom: 30px;">
+        <a href="/admin/newsletter" style="color: #667eea; text-decoration: none;">← Back to Dashboard</a>
+        <h1 style="color: #333; margin: 10px 0;"> Newsletter Subscribers</h1>
+        <p style="color: #666;">Manage your newsletter subscriber list</p>
+    </div>
+
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong style="font-size: 18px;">Total Subscribers: @Model.Count(s => s.IsActive)</strong>
+                <span style="color: #666; margin-left: 15px;">
+                    (@Model.Count(s => !s.IsActive) unsubscribed)
+                </span>
+            </div>
+            <div>
+                <input type="text" id="searchInput" placeholder="Search by email..." 
+                       style="padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; width: 300px;"
+                       onkeyup="filterSubscribers()">
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="subscribersTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                        <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Email</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Status</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Subscribed Date</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Last Email Sent</th>
+                        <th style="padding: 15px; text-align: left; font-weight: 600; color: #333;">Has Account</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var subscriber in Model.OrderByDescending(s => s.SubscribedDate))
+                    {
+                        <tr style="border-bottom: 1px solid #e0e0e0;">
+                            <td style="padding: 15px; color: #333;">@subscriber.Email</td>
+                            <td style="padding: 15px;">
+                                @if (subscriber.IsActive)
+                                {
+                                    <span style="background: #d4edda; color: #155724; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                        ✓ Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="background: #f8d7da; color: #721c24; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
+                                        ✗ Unsubscribed
+                                    </span>
+                                }
+                            </td>
+                            <td style="padding: 15px; color: #666;">@subscriber.SubscribedDate.ToString("MMM dd, yyyy")</td>
+                            <td style="padding: 15px; color: #666;">
+                                @(subscriber.LastEmailSent?.ToString("MMM dd, yyyy") ?? "Never")
+                            </td>
+                            <td style="padding: 15px; color: #666;">
+                                @(subscriber.UserID != null ? "Yes" : "No")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div style="text-align: center; padding: 60px 20px; color: #666;">
+                <div style="font-size: 48px; margin-bottom: 20px;"></div>
+                <p style="font-size: 18px;">No subscribers yet</p>
+                <p>Subscribers will appear here once they sign up for your newsletter.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function filterSubscribers() {
+        var input = document.getElementById('searchInput');
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById('subscribersTable');
+        var rows = table.getElementsByTagName('tr');
+
+        for (var i = 1; i < rows.length; i++) {
+            var email = rows[i].getElementsByTagName('td')[0];
+            if (email) {
+                var txtValue = email.textContent || email.innerText;
+                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    #subscribersTable tr:hover {
+        background: #f8f9fa;
+    }
+</style>

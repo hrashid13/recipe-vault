@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Unsubscribe";
+}
+
+<div class="container" style="max-width: 600px; margin: 80px auto; text-align: center;">
+    @if (ViewBag.Success)
+    {
+        <div style="background: white; padding: 60px 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div style="font-size: 60px; margin-bottom: 20px;">😢</div>
+            <h1 style="color: #333; margin-bottom: 20px;">You've Been Unsubscribed</h1>
+            <p style="color: #666; font-size: 18px; line-height: 1.6;">
+                We're sorry to see you go! You won't receive any more newsletters from RecipesVault.
+            </p>
+            <p style="color: #666; margin-top: 30px;">
+                Changed your mind? You can always subscribe again from our homepage.
+            </p>
+            <a href="/" class="btn btn-primary" style="margin-top: 30px; padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 25px; color: white; text-decoration: none; display: inline-block; font-weight: 600;">
+                Return to RecipesVault
+            </a>
+        </div>
+    }
+    else
+    {
+        <div style="background: white; padding: 60px 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div style="font-size: 60px; margin-bottom: 20px;">❌</div>
+            <h1 style="color: #333; margin-bottom: 20px;">Invalid Unsubscribe Link</h1>
+            <p style="color: #666; font-size: 18px;">
+                This unsubscribe link is invalid or has already been used.
+            </p>
+            <a href="/" class="btn btn-primary" style="margin-top: 30px; padding: 12px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 25px; color: white; text-decoration: none; display: inline-block; font-weight: 600;">
+                Return to RecipesVault
+            </a>
+        </div>
+    }
+</div>

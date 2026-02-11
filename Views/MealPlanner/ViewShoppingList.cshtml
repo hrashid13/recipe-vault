@@ -1,0 +1,122 @@
+@model RecipeManager.Models.ViewModels.ShoppingListViewModel
+@{
+    ViewData["Title"] = "Shopping List";
+}
+
+<div class="container my-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>@Model.ListName</h2>
+            <p class="text-muted">
+                Created on @Model.DateCreated.ToString("MMMM dd, yyyy")
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="WeeklyPlan" asp-route-startDate="@Model.StartDate" class="btn btn-secondary">
+                Back to Meal Planner
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.ItemsByCategory.Any())
+    {
+        <div class="alert alert-info">
+            This shopping list is empty.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        @foreach (var category in Model.ItemsByCategory)
+                        {
+                            <div class="mb-4">
+                                <h4 class="border-bottom pb-2 mb-3">@category.Key</h4>
+                                
+                                <div class="list-group">
+                                    @foreach (var item in category.Value)
+                                    {
+                                        <div class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <div class="col-1">
+                                                    <form asp-action="ToggleItemCheck" method="post" class="d-inline">
+                                                        <input type="hidden" name="itemId" value="@item.ShoppingListItemID" />
+                                                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                                                            @if (item.IsChecked)
+                                                            {
+                                                                <i class="bi bi-check-square-fill text-success" style="font-size: 1.5rem;"></i>
+                                                            }
+                                                            else
+                                                            {
+                                                                <i class="bi bi-square" style="font-size: 1.5rem;"></i>
+                                                            }
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <div class="col-11">
+                                                    <div class="@(item.IsChecked ? "text-decoration-line-through text-muted" : "")">
+                                                        <strong>@item.IngredientName</strong>
+                                                        <span class="ms-2">
+                                                            @item.TotalQuantity.ToString("0.##") @item.UnitName
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Shopping Summary</h5>
+                        <p class="card-text">
+                            <strong>Total Items:</strong> @Model.ItemsByCategory.Sum(c => c.Value.Count)<br />
+                            <strong>Items Checked:</strong> @Model.ItemsByCategory.Sum(c => c.Value.Count(i => i.IsChecked))<br />
+                            <strong>Items Remaining:</strong> @Model.ItemsByCategory.Sum(c => c.Value.Count(i => !i.IsChecked))
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    Print Shopping List
+                </button>
+            </div>
+        </div>
+    }
+
+    <div class="row mt-3">
+        <div class="col-12 text-center">
+            <a asp-action="MyShoppingLists" class="btn btn-outline-secondary">
+                View All My Shopping Lists
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        @@media print {
+            .btn, nav, footer {
+                display: none !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+}

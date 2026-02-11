@@ -1,0 +1,144 @@
+@model IEnumerable<RecipeManager.Models.UserRecipe>
+
+@{
+    ViewData["Title"] = "My Saved Recipes";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">My Saved Recipes</h1>
+            <p class="text-muted">Your personal collection of favorite recipes</p>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="row">
+            <div class="col-md-8 mx-auto text-center py-5">
+                <div class="card shadow-sm">
+                    <div class="card-body p-5">
+                        <i class="bi bi-bookmark" style="font-size: 4rem; color: #6c757d;"></i>
+                        <h3 class="mt-3">No Saved Recipes Yet</h3>
+                        <p class="text-muted mb-4">
+                            Start saving your favorite recipes to build your personal collection!
+                        </p>
+                        <a href="@Url.Action("Index", "Recipe")" class="btn btn-primary">
+                            Browse Recipes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <p class="text-muted">
+                    <strong>@Model.Count()</strong> saved recipe@(Model.Count() == 1 ? "" : "s")
+                </p>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm hover-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">
+                                    <a href="@Url.Action("Details", "Recipe", new { id = item.RecipeID })" class="text-decoration-none text-dark">
+                                        @item.Recipe.RecipeName
+                                    </a>
+                                </h5>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(item.Recipe.Description))
+                            {
+                                <p class="card-text text-muted small">
+                                    @(item.Recipe.Description.Length > 100 ? item.Recipe.Description.Substring(0, 100) + "..." : item.Recipe.Description)
+                                </p>
+                            }
+
+                            <div class="mb-2">
+                                @if (item.Recipe.Cuisine != null)
+                                {
+                                    <span class="badge bg-primary">@item.Recipe.Cuisine.CuisineType</span>
+                                }
+                                @if (!string.IsNullOrEmpty(item.Recipe.DifficultyLevel))
+                                {
+                                    <span class="badge bg-secondary">@item.Recipe.DifficultyLevel</span>
+                                }
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center text-muted small">
+                                <div>
+                                    <i class="bi bi-clock"></i>
+                                    @((item.Recipe.PrepTime + item.Recipe.CookTime)) min
+                                </div>
+                                <div>
+                                    <i class="bi bi-people"></i>
+                                    @item.Recipe.Servings servings
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(item.Notes))
+                            {
+                                <div class="mt-2 p-2 bg-light rounded">
+                                    <small class="text-muted">
+                                        <i class="bi bi-sticky"></i> <strong>Your note:</strong> @item.Notes
+                                    </small>
+                                </div>
+                            }
+
+                            <small class="text-muted d-block mt-2">
+                                Saved on @item.DateSaved.ToString("MMM dd, yyyy")
+                            </small>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Details", "Recipe", new { id = item.RecipeID })" class="btn btn-sm btn-outline-primary flex-grow-1">
+                                    View Recipe
+                                </a>
+                                <form asp-action="Unsave" method="post" class="flex-grow-1" onsubmit="return confirm('Remove this recipe from your saved list?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="recipeId" value="@item.RecipeID" />
+                                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .card-title a:hover {
+        color: #0d6efd !important;
+    }
+</style>

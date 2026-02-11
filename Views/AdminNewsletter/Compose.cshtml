@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "Compose Newsletter";
+}
+
+<div class="container" style="max-width: 1400px; margin: 40px auto; padding: 0 20px;" data-subscriber-count="@ViewBag.SubscriberCount">
+    <div style="margin-bottom: 30px;">
+        <a href="/admin/newsletter" style="color: #667eea; text-decoration: none;">Back to Dashboard</a>
+        <h1 style="color: #333; margin: 10px 0;">Compose Newsletter</h1>
+        <p style="color: #666;">Create and send a newsletter to @ViewBag.SubscriberCount subscribers</p>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        <div>
+            <form id="newsletterForm" method="post" action="/admin/newsletter/send">
+                @Html.AntiForgeryToken()
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px;">
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 600;">Subject Line</label>
+                        <input type="text" name="subject" id="subject" required 
+                               style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;"
+                               placeholder="Enter newsletter subject...">
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 600;">Email Content</label>
+                        <textarea name="htmlContent" id="htmlContent" style="display: none;"></textarea>
+                        <div id="editor" style="min-height: 500px; border: 2px solid #e0e0e0; border-radius: 8px; background: white;"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                        <button type="button" id="previewBtn" class="btn btn-outline-primary" 
+                                style="padding: 12px 30px; border: 2px solid #667eea; background: transparent; border-radius: 8px; color: #667eea; font-weight: 600; cursor: pointer;">
+                            Preview
+                        </button>
+                        <button type="submit" class="btn btn-primary" 
+                                style="padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
+                            Send Newsletter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div>
+            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 18px;">Quick Templates</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button type="button" data-template="weekly" class="template-btn" style="padding: 12px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <strong>Weekly Roundup</strong><br>
+                        <small style="color: #666;">Featured recipes of the week</small>
+                    </button>
+                    <button type="button" data-template="featured" class="template-btn" style="padding: 12px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <strong>Featured Recipes</strong><br>
+                        <small style="color: #666;">Top-rated dishes</small>
+                    </button>
+                    <button type="button" data-template="seasonal" class="template-btn" style="padding: 12px; border: 2px solid #e0e0e0; background: white; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.3s;">
+                        <strong>Seasonal Favorites</strong><br>
+                        <small style="color: #666;">Seasonal ingredients</small>
+                    </button>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 18px;">Featured Recipes</h3>
+                <div id="featuredRecipes" style="max-height: 400px; overflow-y: auto;">
+                    @foreach (var recipe in ViewBag.FeaturedRecipes)
+                    {
+                        <div class="recipe-item" 
+                             data-id="@recipe.RecipeID"
+                             data-name="@Html.Raw(System.Text.Json.JsonSerializer.Serialize(recipe.RecipeName))"
+                             data-desc="@Html.Raw(System.Text.Json.JsonSerializer.Serialize(recipe.Description))"
+                             data-cuisine="@recipe.CuisineType"
+                             data-prep="@recipe.PrepTime"
+                             style="padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; cursor: pointer;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 5px;">@recipe.RecipeName</div>
+                            <div style="font-size: 12px; color: #666;">@recipe.CuisineType - @recipe.PrepTime min</div>
+                        </div>
+                    }
+                </div>
+                <small style="color: #666; display: block; margin-top: 10px;">Click to insert recipe</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        .template-btn:hover { border-color: #667eea; background: #f8f9ff; }
+        .btn:hover { transform: translateY(-2px); transition: all 0.3s ease; }
+        .btn-outline-primary:hover { background: #667eea; color: white; }
+        .ql-editor { min-height: 500px; font-size: 16px; }
+        .recipe-item:hover { background: #f8f9ff; }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="~/js/newsletter-composer.js"></script>
+}

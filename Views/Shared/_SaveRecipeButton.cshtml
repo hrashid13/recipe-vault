@@ -1,0 +1,32 @@
+@model int
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="save-recipe-container" data-recipe-id="@Model">
+        <!-- Save Form -->
+        <form asp-controller="UserRecipes" asp-action="Save" method="post" class="d-inline save-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="recipeId" value="@Model" />
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+            <button type="submit" class="btn btn-sm btn-outline-primary" title="Save recipe">
+                <i class="bi bi-bookmark"></i> Save
+            </button>
+        </form>
+
+        <!-- Unsave Form (hidden by default) -->
+        <form asp-controller="UserRecipes" asp-action="Unsave" method="post" class="d-inline unsave-form d-none">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="recipeId" value="@Model" />
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+            <button type="submit" class="btn btn-sm btn-primary" title="Recipe saved - click to unsave">
+                <i class="bi bi-bookmark-fill"></i> Saved
+            </button>
+        </form>
+    </div>
+}
+else
+{
+    <a href="@Url.Action("Login", "Account", new { returnUrl = Context.Request.Path })" class="btn btn-sm btn-outline-primary" title="Sign in to save recipes">
+        <i class="bi bi-bookmark"></i> Save
+    </a>
+}

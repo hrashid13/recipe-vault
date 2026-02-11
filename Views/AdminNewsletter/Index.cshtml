@@ -1,0 +1,75 @@
+@{
+    ViewData["Title"] = "Newsletter Dashboard";
+}
+
+<div class="container" style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+    <div style="margin-bottom: 40px;">
+        <h1 style="color: #333; margin-bottom: 10px;"> Newsletter Dashboard</h1>
+        <p style="color: #666;">Manage your newsletter campaigns and subscribers</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success" style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" style="background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px;">
+        <!-- Subscriber Count Card -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Total Subscribers</div>
+            <div style="font-size: 36px; font-weight: 700; color: #667eea;">@ViewBag.SubscriberCount</div>
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); grid-column: span 2;">
+            <div style="font-size: 14px; color: #666; margin-bottom: 20px;">Quick Actions</div>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="/admin/newsletter/compose" class="btn btn-primary" style="padding: 12px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 8px; color: white; text-decoration: none; font-weight: 600;">
+                     Compose Newsletter
+                </a>
+                <a href="/admin/newsletter/subscribers" class="btn btn-outline-primary" style="padding: 12px 30px; border: 2px solid #667eea; background: transparent; border-radius: 8px; color: #667eea; text-decoration: none; font-weight: 600;">
+                     View Subscribers
+                </a>
+                <a href="/admin/newsletter/templates" class="btn btn-outline-primary" style="padding: 12px 30px; border: 2px solid #667eea; background: transparent; border-radius: 8px; color: #667eea; text-decoration: none; font-weight: 600;">
+                     Templates
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+        <h2 style="color: #333; margin-bottom: 20px; font-size: 20px;">Getting Started</h2>
+        <div style="color: #666; line-height: 1.8;">
+            <p><strong>Newsletter Tips:</strong></p>
+            <ul style="padding-left: 20px;">
+                <li>Send newsletters regularly (weekly or bi-weekly works best)</li>
+                <li>Keep content engaging with featured recipes and cooking tips</li>
+                <li>Use templates to maintain consistent branding</li>
+                <li>Monitor subscriber growth and engagement</li>
+                <li>Include clear call-to-action buttons</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background: #667eea;
+        color: white;
+    }
+</style>

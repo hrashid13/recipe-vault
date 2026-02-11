@@ -1,0 +1,216 @@
+@using RecipeManager.Models.ViewModels
+@model RecipeManager.Models.ViewModels.WeeklyMealPlanViewModel
+@{
+    ViewData["Title"] = "Weekly Meal Planner";
+}
+
+<div class="container my-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Weekly Meal Planner</h2>
+            <p class="text-muted">
+                @Model.StartDate.ToString("MMMM dd") - @Model.EndDate.ToString("MMMM dd, yyyy")
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group" role="group">
+                <a asp-action="WeeklyPlan" asp-route-startDate="@Model.StartDate.AddDays(-7)" 
+                   class="btn btn-outline-secondary">
+                    Previous Week
+                </a>
+                <a asp-action="WeeklyPlan" asp-route-startDate="@Model.StartDate.AddDays(7)" 
+                   class="btn btn-outline-secondary">
+                    Next Week
+                </a>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 14%;">Monday</th>
+                                    <th style="width: 14%;">Tuesday</th>
+                                    <th style="width: 14%;">Wednesday</th>
+                                    <th style="width: 14%;">Thursday</th>
+                                    <th style="width: 14%;">Friday</th>
+                                    <th style="width: 14%;">Saturday</th>
+                                    <th style="width: 14%;">Sunday</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    @for (int i = 0; i < 7; i++)
+                                    {
+                                        var currentDay = Model.StartDate.AddDays(i);
+                                        var meals = Model.MealsByDay.ContainsKey(currentDay) 
+                                            ? Model.MealsByDay[currentDay] 
+                                            : new List<MealPlanDetail>();
+                                        
+                                        <td class="align-top p-2">
+                                            <div class="text-center mb-2">
+                                                <strong>@currentDay.ToString("dd")</strong>
+                                            </div>
+                                            
+                                            @if (meals.Any())
+                                            {
+                                                @foreach (var mealPlan in meals)
+                                                {
+                                                    <div class="card mb-2">
+                                                        <div class="card-body p-2">
+                                                            <h6 class="card-title mb-1" style="font-size: 0.9rem;">
+                                                                @mealPlan.Recipe.RecipeName
+                                                            </h6>
+                                                            <p class="card-text text-muted mb-2" style="font-size: 0.8rem;">
+                                                                @mealPlan.Recipe.Cuisine?.CuisineType
+                                                            </p>
+                                                            <form asp-action="RemoveMealFromDay" method="post" class="d-inline">
+                                                                <input type="hidden" name="mealPlanId" value="@mealPlan.MealPlanID" />
+                                                                <input type="hidden" name="startDate" value="@Model.StartDate" />
+                                                                <button type="submit" class="btn btn-danger btn-sm w-100" style="font-size: 0.75rem;">
+                                                                    Remove
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <p class="text-muted text-center" style="font-size: 0.85rem;">
+                                                    No meals planned
+                                                </p>
+                                            }
+                                            
+                                            <button type="button" class="btn btn-sm btn-primary w-100" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#recipeModal"
+                                                    data-date="@currentDay.ToString("yyyy-MM-dd")">
+                                                Add Recipe
+                                            </button>
+                                        </td>
+                                    }
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <form asp-action="GenerateShoppingList" method="post">
+                <input type="hidden" name="startDate" value="@Model.StartDate" />
+                <input type="hidden" name="endDate" value="@Model.EndDate" />
+                <button type="submit" class="btn btn-success btn-lg">
+                    Generate Shopping List
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12 text-center">
+            <a asp-action="MyShoppingLists" class="btn btn-outline-secondary">
+                View My Shopping Lists
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Recipe Selection Modal -->
+<div class="modal fade" id="recipeModal" tabindex="-1" aria-labelledby="recipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="recipeModalLabel">Select a Recipe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="recipeSearch" class="form-control mb-3" placeholder="Search recipes...">
+                
+                <div class="list-group" id="recipeList">
+                    @foreach (var recipe in Model.AvailableRecipes)
+                    {
+                        <a href="#" class="list-group-item list-group-item-action recipe-item" 
+                           data-recipe-id="@recipe.RecipeID"
+                           data-recipe-name="@recipe.RecipeName">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">@recipe.RecipeName</h6>
+                                <small class="text-muted">@recipe.Cuisine?.CuisineType</small>
+                            </div>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;">
+                                Prep: @recipe.PrepTime min | Cook: @recipe.CookTime min | Serves: @recipe.Servings
+                            </p>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for adding meals -->
+<form id="addMealForm" asp-action="AddMealToDay" method="post" style="display: none;">
+    <input type="hidden" id="selectedRecipeId" name="recipeId" />
+    <input type="hidden" id="selectedDate" name="plannedDate" />
+</form>
+
+@section Scripts {
+    <script>
+        let selectedDate = null;
+
+        // When Add Recipe button is clicked, store the date
+        document.querySelectorAll('[data-bs-target="#recipeModal"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                selectedDate = this.getAttribute('data-date');
+            });
+        });
+
+        // When a recipe is selected from the list
+        document.querySelectorAll('.recipe-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const recipeId = this.getAttribute('data-recipe-id');
+                
+                // Set form values
+                document.getElementById('selectedRecipeId').value = recipeId;
+                document.getElementById('selectedDate').value = selectedDate;
+                
+                // Submit the form
+                document.getElementById('addMealForm').submit();
+            });
+        });
+
+        // Recipe search functionality
+        document.getElementById('recipeSearch').addEventListener('keyup', function() {
+            const searchValue = this.value.toLowerCase();
+            const recipeItems = document.querySelectorAll('.recipe-item');
+            
+            recipeItems.forEach(item => {
+                const recipeName = item.getAttribute('data-recipe-name').toLowerCase();
+                if (recipeName.includes(searchValue)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+}

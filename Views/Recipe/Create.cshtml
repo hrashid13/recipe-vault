@@ -1,0 +1,429 @@
+@model RecipeManager.Models.Recipe
+
+@{
+    ViewData["Title"] = "Create Recipe";
+}
+
+<!-- Add Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
+<div class="container mt-4">
+    <h1>Create New Recipe</h1>
+
+    <form asp-action="Create" method="post" id="recipeForm">
+        <!-- Basic Information Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Basic Information</h5>
+
+                <div class="mb-3">
+                    <label asp-for="RecipeName" class="form-label">Recipe Name</label>
+                    <input asp-for="RecipeName" class="form-control" placeholder="e.g., Chocolate Chip Cookies" required />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Brief description of your recipe"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="PrepTime" class="form-label">Prep Time (minutes)</label>
+                        <input asp-for="PrepTime" class="form-control" type="number" min="0" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="CookTime" class="form-label">Cook Time (minutes)</label>
+                        <input asp-for="CookTime" class="form-control" type="number" min="0" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Servings" class="form-label">Servings</label>
+                        <input asp-for="Servings" class="form-control" type="number" min="1" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="CuisineID" class="form-label">Cuisine Type</label>
+                        <select asp-for="CuisineID" class="form-select" required>
+                            <option value="">-- Select Cuisine --</option>
+                            @foreach (var cuisine in ViewBag.Cuisines)
+                            {
+                                    <option value="@cuisine.CuisineID">@cuisine.CuisineType</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DifficultyLevel" class="form-label">Difficulty Level</label>
+                        <select asp-for="DifficultyLevel" class="form-select">
+                            <option value="">-- Select Difficulty --</option>
+                            <option value="Easy">Easy</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Hard">Hard</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingredients Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Ingredients</h5>
+
+                <p class="text-muted small">
+                    Don't see an ingredient? 
+                    <a href="#" id="openAddIngredientModal" class="text-primary">
+                        <strong>Add a new ingredient</strong>
+                    </a> 
+                    (opens in popup)
+                </p>
+
+                <div id="ingredients-container"></div>
+                <button type="button" class="btn btn-sm btn-success mt-2" id="addIngredientBtn">
+                    + Add Ingredient
+                </button>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Instructions</h5>
+                <div id="instructions-container"></div>
+                <button type="button" class="btn btn-sm btn-success mt-2" id="addInstructionBtn">
+                    + Add Step
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary btn-lg">Create Recipe</button>
+            <a asp-action="Index" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- Modal for Adding New Ingredient -->
+<div class="modal fade" id="addIngredientModal" tabindex="-1" aria-labelledby="addIngredientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIngredientModalLabel"> Add New Ingredient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert" class="alert d-none"></div>
+                
+                <div class="mb-3">
+                    <label for="newIngredientName" class="form-label">Ingredient Name</label>
+                    <input type="text" class="form-control" id="newIngredientName" placeholder="e.g., Basil, Garlic, Paprika..." required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="newIngredientCategory" class="form-label">Category</label>
+                    <select class="form-select" id="newIngredientCategory" required>
+                        <option value="">-- Select Category --</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                <option value="@category.CategoryID">@category.CategoryName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveNewIngredient">
+                    <span id="saveButtonText">Save Ingredient</span>
+                    <span id="saveButtonSpinner" class="spinner-border spinner-border-sm d-none" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        // Counter variables
+        let ingredientIndex = 0;
+        let instructionIndex = 0;
+
+        // Data from server
+        let ingredients = @Html.Raw(Json.Serialize(ViewBag.Ingredients ?? new List<object>()));
+        const units = @Html.Raw(Json.Serialize(ViewBag.Units ?? new List<object>()));
+
+        // Get preselected ingredients from ViewBag
+        const preselectedIngredientsString = '@ViewBag.PreselectedIngredients';
+        const preselectedIngredients = preselectedIngredientsString ? preselectedIngredientsString.split(',') : [];
+
+        // Get containers
+        const ingredientsContainer = document.getElementById('ingredients-container');
+        const instructionsContainer = document.getElementById('instructions-container');
+
+        // Modal elements
+        const addIngredientModal = new bootstrap.Modal(document.getElementById('addIngredientModal'));
+        const modalAlert = document.getElementById('modalAlert');
+        const newIngredientName = document.getElementById('newIngredientName');
+        const newIngredientCategory = document.getElementById('newIngredientCategory');
+        const saveNewIngredient = document.getElementById('saveNewIngredient');
+        const saveButtonText = document.getElementById('saveButtonText');
+        const saveButtonSpinner = document.getElementById('saveButtonSpinner');
+
+        // Open modal
+        document.getElementById('openAddIngredientModal').addEventListener('click', function(e) {
+            e.preventDefault();
+            modalAlert.classList.add('d-none');
+            newIngredientName.value = '';
+            newIngredientCategory.value = '';
+            addIngredientModal.show();
+        });
+
+        // Save new ingredient via AJAX
+        saveNewIngredient.addEventListener('click', async function() {
+            const ingredientName = newIngredientName.value.trim();
+            const categoryId = newIngredientCategory.value;
+
+            if (!ingredientName || !categoryId) {
+                showModalAlert('Please fill in all fields', 'danger');
+                return;
+            }
+
+            // Show loading state
+            saveButtonText.classList.add('d-none');
+            saveButtonSpinner.classList.remove('d-none');
+            saveNewIngredient.disabled = true;
+
+            try {
+                // Get anti-forgery token from the main form
+                const token = document.querySelector('#recipeForm input[name="__RequestVerificationToken"]').value;
+                
+                const response = await fetch('/Ingredients/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'IngredientName': ingredientName,
+                        'CategoryID': categoryId,
+                        '__RequestVerificationToken': token
+                    })
+                });
+
+                if (response.ok || response.redirected) {
+                    // Fetch updated ingredients list from our new API endpoint
+                    const ingredientsResponse = await fetch('/Ingredients/GetIngredientsJson');
+                    const updatedIngredients = await ingredientsResponse.json();
+                    
+                    // Update the global ingredients array
+                    ingredients = updatedIngredients;
+                    
+                    showModalAlert(`✓ "${ingredientName}" added successfully!`, 'success');
+                    
+                    // Close modal after 1 second and refresh dropdowns
+                    setTimeout(() => {
+                        addIngredientModal.hide();
+                        refreshIngredientDropdowns();
+                    }, 1000);
+                } else {
+                    showModalAlert('Failed to add ingredient. Please try again.', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showModalAlert('An error occurred. Please try again.', 'danger');
+            } finally {
+                // Reset button state
+                saveButtonText.classList.remove('d-none');
+                saveButtonSpinner.classList.add('d-none');
+                saveNewIngredient.disabled = false;
+            }
+        });
+
+        // Show alert in modal
+        function showModalAlert(message, type) {
+            modalAlert.className = `alert alert-${type}`;
+            modalAlert.textContent = message;
+            modalAlert.classList.remove('d-none');
+        }
+
+        // Refresh ingredient dropdowns
+        function refreshIngredientDropdowns() {
+            const selects = document.querySelectorAll('.ingredient-select');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                
+                // Rebuild options
+                let optionsHtml = '<option value="">-- Select Ingredient --</option>';
+                ingredients.forEach(i => {
+                    optionsHtml += `<option value="${i.ingredientID}">${i.ingredientName}</option>`;
+                });
+                
+                select.innerHTML = optionsHtml;
+                select.value = currentValue;
+                
+                // Reinitialize Select2
+                $(select).select2('destroy');
+                $(select).select2({
+                    theme: 'bootstrap-5',
+                    placeholder: 'Search for an ingredient...',
+                    allowClear: true,
+                    width: '100%'
+                });
+            });
+        }
+
+        // Add ingredient button
+        document.getElementById('addIngredientBtn').addEventListener('click', function() {
+            addIngredientRow();
+        });
+
+        // Add instruction button
+        document.getElementById('addInstructionBtn').addEventListener('click', function() {
+            addInstructionRow();
+        });
+
+        // Function to add ingredient row
+        function addIngredientRow(preselectedIngredientName = null) {
+            const index = ingredientIndex++;
+
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row mb-2 ingredient-row';
+
+            // Build the ingredient dropdown options
+            let optionsHtml = '<option value="">-- Select Ingredient --</option>';
+            ingredients.forEach(i => {
+                const selected = (preselectedIngredientName &&
+                                i.ingredientName.toLowerCase() === preselectedIngredientName.toLowerCase())
+                                ? 'selected' : '';
+                optionsHtml += `<option value="${i.ingredientID}" ${selected}>${i.ingredientName}</option>`;
+            });
+
+            rowDiv.innerHTML = `
+                <div class="col-md-4">
+                    <select name="Ingredients[${index}].IngredientID" class="form-select ingredient-select" required>
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="Ingredients[${index}].Quantity" class="form-control"
+                           placeholder="Qty" step="0.01" min="0.01" required />
+                </div>
+                <div class="col-md-3">
+                    <select name="Ingredients[${index}].UnitID" class="form-select" required>
+                        <option value="">-- Unit --</option>
+                        ${units.map(u => `<option value="${u.unitID}">${u.unitName}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="Ingredients[${index}].Notes" class="form-control"
+                           placeholder="Notes" />
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            ingredientsContainer.appendChild(rowDiv);
+        }
+
+        // Function to add instruction row
+        function addInstructionRow() {
+            const index = instructionIndex++;
+            const stepNum = instructionsContainer.children.length + 1;
+
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row mb-2 instruction-row';
+            rowDiv.innerHTML = `
+                <div class="col-md-1">
+                    <span class="badge bg-secondary">${stepNum}</span>
+                    <input type="hidden" name="Instructions[${index}].StepNumber" value="${stepNum}" />
+                </div>
+                <div class="col-md-10">
+                    <textarea name="Instructions[${index}].InstructionText" class="form-control"
+                              rows="2" placeholder="Describe this step..." required></textarea>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm"
+                            onclick="removeInstructionRow(this)">×</button>
+                </div>
+            `;
+
+            instructionsContainer.appendChild(rowDiv);
+        }
+
+        // Function to remove instruction and renumber
+        function removeInstructionRow(button) {
+            button.parentElement.parentElement.remove();
+            renumberInstructions();
+        }
+
+        // Function to renumber instructions
+        function renumberInstructions() {
+            const rows = instructionsContainer.querySelectorAll('.instruction-row');
+            rows.forEach((row, idx) => {
+                const stepNum = idx + 1;
+                row.querySelector('.badge').textContent = stepNum;
+                row.querySelector('input[type="hidden"]').value = stepNum;
+            });
+        }
+
+        // Initialize on page load
+        if (preselectedIngredients.length > 0) {
+            preselectedIngredients.forEach(ingredientName => {
+                if (ingredientName.trim()) {
+                    addIngredientRow(ingredientName.trim());
+                }
+            });
+
+            const card = document.querySelector('.card');
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show';
+            alert.innerHTML = `
+                <strong>AI-Detected Ingredients Loaded!</strong>
+                ${preselectedIngredients.length} ingredient(s) have been pre-selected.
+                Add quantities and adjust as needed.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            card.parentElement.insertBefore(alert, card);
+        } else {
+            addIngredientRow();
+        }
+
+        addInstructionRow();
+
+        // Initialize Select2
+        function initializeSelect2() {
+            $('.ingredient-select').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Search for an ingredient...',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return "No ingredient found. Try different spelling or add it to the database.";
+                    }
+                }
+            });
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    initializeSelect2();
+                }
+            });
+        });
+
+        observer.observe(ingredientsContainer, { childList: true });
+        setTimeout(initializeSelect2, 100);
+    </script>
+}
