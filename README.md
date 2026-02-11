@@ -2,8 +2,8 @@
 
 A full-stack recipe management system with AI-powered meal planning capabilities, demonstrating enterprise-level architecture patterns and modern web development practices.
 
-[![Live Demo](https://img.shields.io/badge/Demo-recipesvault.org-blue)](https://recipesvault.org)
-[![AI Chatbot](https://img.shields.io/badge/AI-munchai.org-green)](https://munchai.org)
+[![Live Demo](https://img.shields.io/badge/Demo-recipesvault.org-blue)](https://www.recipesvault.org)
+[![AI Chatbot](https://img.shields.io/badge/AI-munchai.org-green)](https://www.munchai.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Project Overview
