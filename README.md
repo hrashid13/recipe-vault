@@ -329,7 +329,7 @@ Master's in AI and Business Analytics - University of South Florida
 
 ## Contact
 
-For questions or collaboration opportunities, please reach out via [email] or LinkedIn.
+For questions or collaboration opportunities, please reach out via h.f.rashid@gmail.com or LinkedIn.
 
 ---
 
